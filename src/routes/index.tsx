@@ -41,7 +41,13 @@ function HomePage() {
           {heroSlides.map((s, i) => (
             <article key={i} className={`hero-slide ${i === hero ? "active" : ""}`}>
               <Link to={s.to} search={s.search} aria-label={s.alt}>
-                <img src={s.src} alt={s.alt} />
+                <img
+                  src={s.src}
+                  alt={s.alt}
+                  loading={i === 0 ? "eager" : "lazy"}
+                  decoding={i === 0 ? "sync" : "async"}
+                  fetchPriority={i === 0 ? "high" : "low"}
+                />
               </Link>
             </article>
           ))}
@@ -105,7 +111,7 @@ function HomePage() {
             search={{ category: t.cat }}
           >
             <span>{t.label}</span>
-            <img src={t.img} alt={`Destaque de ${t.label.toLowerCase()}`} />
+            <img src={t.img} alt={`Destaque de ${t.label.toLowerCase()}`} loading="lazy" decoding="async" />
           </Link>
         ))}
       </section>
