@@ -78,7 +78,7 @@ export function ProductCard({ product, variant = "featured" }: Props) {
           {inWishlist ? "♥" : "♡"}
         </button>
         <Link to="/produto/$id" params={{ id: String(product.id) }}>
-          <img src={product.image} alt={product.imageAlt} loading="lazy" />
+          <img src={product.image} alt={product.imageAlt} loading="lazy" decoding="async" />
         </Link>
       </div>
       <div className="product-info">
