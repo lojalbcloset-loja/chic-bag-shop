@@ -3,13 +3,21 @@
 //   - tanstackStart, viteReact, tailwindcss, tsConfigPaths, cloudflare (build-only),
 //     componentTagger (dev-only), VITE_* env injection, @ path alias, React/TanStack dedupe,
 //     error logger plugins, and sandbox detection (port/host/strictPort).
-// You can pass additional config via defineConfig({ vite: { ... } }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
-// Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
-// @cloudflare/vite-plugin builds from this — wrangler.jsonc main alone is insufficient.
+// Expõe os secrets LB_SUPABASE_* como VITE_* para o bundle do navegador.
+// (URL e publishable key são públicos por design.)
+const SUPA_URL = process.env.LB_SUPABASE_URL ?? "";
+const SUPA_KEY = process.env.LB_SUPABASE_PUBLISHABLE_KEY ?? "";
+
 export default defineConfig({
   tanstackStart: {
     server: { entry: "server" },
+  },
+  vite: {
+    define: {
+      "import.meta.env.VITE_LB_SUPABASE_URL": JSON.stringify(SUPA_URL),
+      "import.meta.env.VITE_LB_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(SUPA_KEY),
+    },
   },
 });
