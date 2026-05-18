@@ -118,7 +118,9 @@ function RootComponent() {
       <AuthProvider>
         <PromoBar />
         <Header />
-        <Outlet />
+        <main>
+          <Outlet />
+        </main>
         <Footer />
         <WhatsappFab />
         <CartDrawer />
