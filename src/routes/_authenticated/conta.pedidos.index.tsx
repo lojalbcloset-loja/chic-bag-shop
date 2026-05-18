@@ -36,7 +36,7 @@ function OrdersPage() {
         <p className="text-sm text-muted-foreground">Você ainda não fez pedidos.</p>
       ) : (
         <div className="grid gap-3">
-          {data.orders.map((o) => (
+          {data.orders.map((o: { id: string; order_number: string; status: string; total_cents: number; created_at: string }) => (
             <Link key={o.id} to="/conta/pedidos/$id" params={{ id: o.id }}>
               <Card className="transition-colors hover:bg-accent/30">
                 <CardContent className="flex flex-wrap items-center justify-between gap-4 p-4">

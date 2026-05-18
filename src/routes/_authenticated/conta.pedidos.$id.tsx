@@ -42,7 +42,7 @@ function OrderDetailPage() {
       <Card>
         <CardHeader><CardTitle className="text-base">Itens</CardTitle></CardHeader>
         <CardContent className="space-y-3">
-          {items.map((it) => {
+          {items.map((it: { id: string; quantity: number; line_total_cents: number; product_snapshot: unknown }) => {
             const snap = (it.product_snapshot ?? {}) as { name?: string; sku?: string };
             return (
               <div key={it.id} className="flex justify-between text-sm">
@@ -75,7 +75,7 @@ function OrderDetailPage() {
         <Card>
           <CardHeader><CardTitle className="text-base">Histórico</CardTitle></CardHeader>
           <CardContent className="space-y-2 text-sm">
-            {events.map((ev) => (
+            {events.map((ev: { id: string; type: string; created_at: string }) => (
               <div key={ev.id} className="flex gap-3">
                 <span className="text-muted-foreground">
                   {new Date(ev.created_at).toLocaleString("pt-BR")}
