@@ -15,6 +15,8 @@ import { Footer } from "@/components/Footer";
 import { WhatsappFab } from "@/components/WhatsappFab";
 import { CartDrawer } from "@/components/CartDrawer";
 import { LoginDrawer } from "@/components/LoginDrawer";
+import { AuthProvider } from "@/hooks/use-auth";
+import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -113,13 +115,16 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-      <PromoBar />
-      <Header />
-      <Outlet />
-      <Footer />
-      <WhatsappFab />
-      <CartDrawer />
-      <LoginDrawer />
+      <AuthProvider>
+        <PromoBar />
+        <Header />
+        <Outlet />
+        <Footer />
+        <WhatsappFab />
+        <CartDrawer />
+        <LoginDrawer />
+        <Toaster />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
