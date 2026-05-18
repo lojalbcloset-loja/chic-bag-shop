@@ -41,7 +41,13 @@ function HomePage() {
           {heroSlides.map((s, i) => (
             <article key={i} className={`hero-slide ${i === hero ? "active" : ""}`}>
               <Link to={s.to} search={s.search} aria-label={s.alt}>
-                <img src={s.src} alt={s.alt} />
+                <img
+                  src={s.src}
+                  alt={s.alt}
+                  loading={i === 0 ? "eager" : "lazy"}
+                  decoding={i === 0 ? "sync" : "async"}
+                  fetchPriority={i === 0 ? "high" : "low"}
+                />
               </Link>
             </article>
           ))}
