@@ -111,7 +111,7 @@ function HomePage() {
             search={{ category: t.cat }}
           >
             <span>{t.label}</span>
-            <img src={t.img} alt={`Destaque de ${t.label.toLowerCase()}`} />
+            <img src={t.img} alt={`Destaque de ${t.label.toLowerCase()}`} loading="lazy" decoding="async" />
           </Link>
         ))}
       </section>
