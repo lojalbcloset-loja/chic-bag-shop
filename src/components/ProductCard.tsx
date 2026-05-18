@@ -34,7 +34,7 @@ export function ProductCard({ product, variant = "featured" }: Props) {
           >
             {inWishlist ? "♥" : "♡"}
           </button>
-          <img src={product.image} alt={product.imageAlt} loading="lazy" />
+          <img src={product.image} alt={product.imageAlt} loading="lazy" decoding="async" />
         </Link>
         <div className="featured-product-info">
           <span>{product.sku}</span>

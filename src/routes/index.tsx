@@ -89,6 +89,7 @@ function HomePage() {
             muted
             playsInline
             loop
+            preload="metadata"
           />
         </div>
         <Link className="collection-callout" to="/loja">
