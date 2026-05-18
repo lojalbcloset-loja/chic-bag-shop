@@ -11,8 +11,13 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LojaRouteImport } from './routes/loja'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProdutoIdRouteImport } from './routes/produto.$id'
+import { Route as AuthenticatedContaIndexRouteImport } from './routes/_authenticated/conta.index'
+import { Route as AuthenticatedContaEnderecosRouteImport } from './routes/_authenticated/conta.enderecos'
+import { Route as AuthenticatedContaPedidosIndexRouteImport } from './routes/_authenticated/conta.pedidos.index'
+import { Route as AuthenticatedContaPedidosIdRouteImport } from './routes/_authenticated/conta.pedidos.$id'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -22,6 +27,10 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const LojaRoute = LojaRouteImport.update({
   id: '/loja',
   path: '/loja',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -34,36 +43,99 @@ const ProdutoIdRoute = ProdutoIdRouteImport.update({
   path: '/produto/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedContaIndexRoute = AuthenticatedContaIndexRouteImport.update({
+  id: '/conta/',
+  path: '/conta/',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedContaEnderecosRoute =
+  AuthenticatedContaEnderecosRouteImport.update({
+    id: '/conta/enderecos',
+    path: '/conta/enderecos',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedContaPedidosIndexRoute =
+  AuthenticatedContaPedidosIndexRouteImport.update({
+    id: '/conta/pedidos/',
+    path: '/conta/pedidos/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedContaPedidosIdRoute =
+  AuthenticatedContaPedidosIdRouteImport.update({
+    id: '/conta/pedidos/$id',
+    path: '/conta/pedidos/$id',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/loja': typeof LojaRoute
   '/reset-password': typeof ResetPasswordRoute
   '/produto/$id': typeof ProdutoIdRoute
+  '/conta/enderecos': typeof AuthenticatedContaEnderecosRoute
+  '/conta/': typeof AuthenticatedContaIndexRoute
+  '/conta/pedidos/$id': typeof AuthenticatedContaPedidosIdRoute
+  '/conta/pedidos/': typeof AuthenticatedContaPedidosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/loja': typeof LojaRoute
   '/reset-password': typeof ResetPasswordRoute
   '/produto/$id': typeof ProdutoIdRoute
+  '/conta/enderecos': typeof AuthenticatedContaEnderecosRoute
+  '/conta': typeof AuthenticatedContaIndexRoute
+  '/conta/pedidos/$id': typeof AuthenticatedContaPedidosIdRoute
+  '/conta/pedidos': typeof AuthenticatedContaPedidosIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/loja': typeof LojaRoute
   '/reset-password': typeof ResetPasswordRoute
   '/produto/$id': typeof ProdutoIdRoute
+  '/_authenticated/conta/enderecos': typeof AuthenticatedContaEnderecosRoute
+  '/_authenticated/conta/': typeof AuthenticatedContaIndexRoute
+  '/_authenticated/conta/pedidos/$id': typeof AuthenticatedContaPedidosIdRoute
+  '/_authenticated/conta/pedidos/': typeof AuthenticatedContaPedidosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/loja' | '/reset-password' | '/produto/$id'
+  fullPaths:
+    | '/'
+    | '/loja'
+    | '/reset-password'
+    | '/produto/$id'
+    | '/conta/enderecos'
+    | '/conta/'
+    | '/conta/pedidos/$id'
+    | '/conta/pedidos/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/loja' | '/reset-password' | '/produto/$id'
-  id: '__root__' | '/' | '/loja' | '/reset-password' | '/produto/$id'
+  to:
+    | '/'
+    | '/loja'
+    | '/reset-password'
+    | '/produto/$id'
+    | '/conta/enderecos'
+    | '/conta'
+    | '/conta/pedidos/$id'
+    | '/conta/pedidos'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/loja'
+    | '/reset-password'
+    | '/produto/$id'
+    | '/_authenticated/conta/enderecos'
+    | '/_authenticated/conta/'
+    | '/_authenticated/conta/pedidos/$id'
+    | '/_authenticated/conta/pedidos/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LojaRoute: typeof LojaRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ProdutoIdRoute: typeof ProdutoIdRoute
@@ -85,6 +157,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LojaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -99,11 +178,58 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProdutoIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/conta/': {
+      id: '/_authenticated/conta/'
+      path: '/conta'
+      fullPath: '/conta/'
+      preLoaderRoute: typeof AuthenticatedContaIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/conta/enderecos': {
+      id: '/_authenticated/conta/enderecos'
+      path: '/conta/enderecos'
+      fullPath: '/conta/enderecos'
+      preLoaderRoute: typeof AuthenticatedContaEnderecosRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/conta/pedidos/': {
+      id: '/_authenticated/conta/pedidos/'
+      path: '/conta/pedidos'
+      fullPath: '/conta/pedidos/'
+      preLoaderRoute: typeof AuthenticatedContaPedidosIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/conta/pedidos/$id': {
+      id: '/_authenticated/conta/pedidos/$id'
+      path: '/conta/pedidos/$id'
+      fullPath: '/conta/pedidos/$id'
+      preLoaderRoute: typeof AuthenticatedContaPedidosIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedContaEnderecosRoute: typeof AuthenticatedContaEnderecosRoute
+  AuthenticatedContaIndexRoute: typeof AuthenticatedContaIndexRoute
+  AuthenticatedContaPedidosIdRoute: typeof AuthenticatedContaPedidosIdRoute
+  AuthenticatedContaPedidosIndexRoute: typeof AuthenticatedContaPedidosIndexRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedContaEnderecosRoute: AuthenticatedContaEnderecosRoute,
+  AuthenticatedContaIndexRoute: AuthenticatedContaIndexRoute,
+  AuthenticatedContaPedidosIdRoute: AuthenticatedContaPedidosIdRoute,
+  AuthenticatedContaPedidosIndexRoute: AuthenticatedContaPedidosIndexRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LojaRoute: LojaRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ProdutoIdRoute: ProdutoIdRoute,
@@ -111,3 +237,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
