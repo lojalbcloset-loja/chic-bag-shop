@@ -78,19 +78,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-const defaultAuthState: AuthState = {
-  user: null,
-  session: null,
-  roles: [],
-  loading: true,
-  isAuthenticated: false,
-  isStaff: false,
-  isAdmin: false,
-  signOut: async () => {},
-  refreshRoles: async () => {},
-};
-
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  return ctx ?? defaultAuthState;
+  if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
+  return ctx;
 }
