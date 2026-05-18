@@ -81,7 +81,7 @@ export function CartDrawer() {
                 </strong>
                 <button
                   type="button"
-                  onClick={() => remove(String(l.productId) as unknown as number)}
+                  onClick={() => remove(l.productId)}
                   style={{ background: "none", border: 0, color: "#999", fontSize: 11 }}
                 >
                   Remover
