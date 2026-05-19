@@ -31,7 +31,6 @@ export function Header() {
           <Link to="/loja" search={{ category: "Carteiras" }}>Carteiras</Link>
           <Link to="/loja" search={{ category: "Cintos" }}>Cintos</Link>
           <Link to="/loja" search={{ category: "Bonés" }}>Bonés</Link>
-          <Link to="/loja">Monte seu Kit</Link>
           <Link to="/loja" search={{ category: "Liqui" }} className="promo-nav">
             Promoções
           </Link>
