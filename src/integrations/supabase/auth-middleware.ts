@@ -59,8 +59,8 @@ export const requireStaff = createMiddleware({ type: "function" })
     }
     const token = authHeader.slice(7);
     const admin = createClient(
-      process.env.LB_SUPABASE_URL!,
-      process.env.LB_SUPABASE_SERVICE_ROLE_KEY!,
+      getSupabaseUrl(),
+      getSupabaseServiceRoleKey(),
       { auth: { persistSession: false } },
     );
     const { data: userData, error } = await admin.auth.getUser(token);
@@ -74,8 +74,8 @@ export const requireStaff = createMiddleware({ type: "function" })
     if (!hasStaff) throw new Response("Forbidden", { status: 403 });
 
     const supabase = createClient(
-      process.env.LB_SUPABASE_URL!,
-      process.env.LB_SUPABASE_PUBLISHABLE_KEY!,
+      getSupabaseUrl(),
+      getSupabasePublishableKey(),
       {
         auth: { persistSession: false },
         global: { headers: { Authorization: `Bearer ${token}` } },
