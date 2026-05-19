@@ -20,9 +20,9 @@ export const requireSupabaseAuth = createMiddleware({ type: "function" }).server
     }
     const token = authHeader.slice(7);
 
-    const url = process.env.LB_SUPABASE_URL!;
-    const publishable = process.env.LB_SUPABASE_PUBLISHABLE_KEY!;
-    const service = process.env.LB_SUPABASE_SERVICE_ROLE_KEY!;
+    const url = getSupabaseUrl();
+    const publishable = getSupabasePublishableKey();
+    const service = getSupabaseServiceRoleKey();
 
     // valida o token
     const admin = createClient(url, service, { auth: { persistSession: false } });
