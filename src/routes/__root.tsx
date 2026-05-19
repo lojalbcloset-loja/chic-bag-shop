@@ -16,6 +16,7 @@ import { WhatsappFab } from "@/components/WhatsappFab";
 import { CartDrawer } from "@/components/CartDrawer";
 import { LoginDrawer } from "@/components/LoginDrawer";
 import { AuthProvider } from "@/hooks/use-auth";
+import { useCartSync } from "@/hooks/use-cart-sync";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -137,8 +138,6 @@ function RootComponent() {
 }
 
 function CartSyncBridge() {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { useCartSync } = require("@/hooks/use-cart-sync") as typeof import("@/hooks/use-cart-sync");
   useCartSync();
   return null;
 }
