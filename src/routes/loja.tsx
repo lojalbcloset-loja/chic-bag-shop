@@ -114,12 +114,6 @@ function LojaPage() {
 
       <div className="store-layout-grid">
         <aside className={`store-sidebar ${filtersOpen ? "open" : ""}`}>
-          <div className="sidebar-header mobile-only">
-            <strong>FILTRO</strong>
-            <button type="button" aria-label="Fechar filtros" onClick={() => setFiltersOpen(false)}>
-              ×
-            </button>
-          </div>
           <h2 className="sidebar-title">FILTRO</h2>
 
           {categories.length > 0 && (
