@@ -11,9 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LojaRouteImport } from './routes/loja'
+import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProdutoSlugRouteImport } from './routes/produto.$slug'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedContaIndexRouteImport } from './routes/_authenticated/conta.index'
 import { Route as AuthenticatedContaEnderecosRouteImport } from './routes/_authenticated/conta.enderecos'
 import { Route as AuthenticatedContaPedidosIndexRouteImport } from './routes/_authenticated/conta.pedidos.index'
@@ -29,6 +31,11 @@ const LojaRoute = LojaRouteImport.update({
   path: '/loja',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -42,6 +49,11 @@ const ProdutoSlugRoute = ProdutoSlugRouteImport.update({
   id: '/produto/$slug',
   path: '/produto/$slug',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedContaIndexRoute = AuthenticatedContaIndexRouteImport.update({
   id: '/conta/',
@@ -69,8 +81,10 @@ const AuthenticatedContaPedidosIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/checkout': typeof CheckoutRoute
   '/loja': typeof LojaRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/produto/$slug': typeof ProdutoSlugRoute
   '/conta/enderecos': typeof AuthenticatedContaEnderecosRoute
   '/conta/': typeof AuthenticatedContaIndexRoute
@@ -79,8 +93,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/checkout': typeof CheckoutRoute
   '/loja': typeof LojaRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/produto/$slug': typeof ProdutoSlugRoute
   '/conta/enderecos': typeof AuthenticatedContaEnderecosRoute
   '/conta': typeof AuthenticatedContaIndexRoute
@@ -91,8 +107,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/checkout': typeof CheckoutRoute
   '/loja': typeof LojaRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/produto/$slug': typeof ProdutoSlugRoute
   '/_authenticated/conta/enderecos': typeof AuthenticatedContaEnderecosRoute
   '/_authenticated/conta/': typeof AuthenticatedContaIndexRoute
@@ -103,8 +121,10 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/checkout'
     | '/loja'
     | '/reset-password'
+    | '/admin'
     | '/produto/$slug'
     | '/conta/enderecos'
     | '/conta/'
@@ -113,8 +133,10 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/checkout'
     | '/loja'
     | '/reset-password'
+    | '/admin'
     | '/produto/$slug'
     | '/conta/enderecos'
     | '/conta'
@@ -124,8 +146,10 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/checkout'
     | '/loja'
     | '/reset-password'
+    | '/_authenticated/admin'
     | '/produto/$slug'
     | '/_authenticated/conta/enderecos'
     | '/_authenticated/conta/'
@@ -136,6 +160,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  CheckoutRoute: typeof CheckoutRoute
   LojaRoute: typeof LojaRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ProdutoSlugRoute: typeof ProdutoSlugRoute
@@ -155,6 +180,13 @@ declare module '@tanstack/react-router' {
       path: '/loja'
       fullPath: '/loja'
       preLoaderRoute: typeof LojaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -177,6 +209,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/produto/$slug'
       preLoaderRoute: typeof ProdutoSlugRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/conta/': {
       id: '/_authenticated/conta/'
@@ -210,6 +249,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedContaEnderecosRoute: typeof AuthenticatedContaEnderecosRoute
   AuthenticatedContaIndexRoute: typeof AuthenticatedContaIndexRoute
   AuthenticatedContaPedidosIdRoute: typeof AuthenticatedContaPedidosIdRoute
@@ -217,6 +257,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedContaEnderecosRoute: AuthenticatedContaEnderecosRoute,
   AuthenticatedContaIndexRoute: AuthenticatedContaIndexRoute,
   AuthenticatedContaPedidosIdRoute: AuthenticatedContaPedidosIdRoute,
@@ -230,6 +271,7 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  CheckoutRoute: CheckoutRoute,
   LojaRoute: LojaRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ProdutoSlugRoute: ProdutoSlugRoute,
@@ -237,3 +279,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

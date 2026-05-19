@@ -121,6 +121,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   return (
     <>
+      <CartSyncBridge />
       <PromoBar />
       <Header />
       <main>
@@ -133,4 +134,11 @@ function RootComponent() {
       <Toaster />
     </>
   );
+}
+
+function CartSyncBridge() {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { useCartSync } = require("@/hooks/use-cart-sync") as typeof import("@/hooks/use-cart-sync");
+  useCartSync();
+  return null;
 }
