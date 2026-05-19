@@ -16,6 +16,7 @@ import { WhatsappFab } from "@/components/WhatsappFab";
 import { CartDrawer } from "@/components/CartDrawer";
 import { LoginDrawer } from "@/components/LoginDrawer";
 import { AuthProvider } from "@/hooks/use-auth";
+import { useCartSync } from "@/hooks/use-cart-sync";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -121,6 +122,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   return (
     <>
+      <CartSyncBridge />
       <PromoBar />
       <Header />
       <main>
@@ -133,4 +135,9 @@ function RootComponent() {
       <Toaster />
     </>
   );
+}
+
+function CartSyncBridge() {
+  useCartSync();
+  return null;
 }

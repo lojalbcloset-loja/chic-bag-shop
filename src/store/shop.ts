@@ -1,20 +1,26 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { allProducts, type Product } from "@/lib/catalog";
+import type { DbProduct, DbVariant } from "@/lib/products";
 
 export interface CartItem {
-  productId: number;
+  variantId: string;
   quantity: number;
+}
+
+export interface CartLine extends CartItem {
+  product: DbProduct;
+  variant: DbVariant;
 }
 
 interface ShopState {
   cart: CartItem[];
-  wishlist: number[];
-  addToCart: (id: number, open?: boolean) => void;
-  removeFromCart: (id: number) => void;
-  updateQty: (id: number, qty: number) => void;
+  wishlist: string[];
+  addToCart: (variantId: string, qty?: number, open?: boolean) => void;
+  removeFromCart: (variantId: string) => void;
+  updateQty: (variantId: string, qty: number) => void;
   clearCart: () => void;
-  toggleWishlist: (id: number) => void;
+  replaceCart: (items: CartItem[]) => void;
+  toggleWishlist: (productId: string) => void;
   cartOpen: boolean;
   loginOpen: boolean;
   menuOpen: boolean;
@@ -34,49 +40,62 @@ export const useShop = create<ShopState>()(
       loginOpen: false,
       menuOpen: false,
       searchOpen: false,
-      addToCart: (id, open = true) =>
+      addToCart: (variantId, qty = 1, open = true) =>
         set((s) => {
-          const exists = s.cart.find((c) => c.productId === id);
+          const exists = s.cart.find((c) => c.variantId === variantId);
           const cart = exists
             ? s.cart.map((c) =>
-                c.productId === id ? { ...c, quantity: c.quantity + 1 } : c,
+                c.variantId === variantId ? { ...c, quantity: c.quantity + qty } : c,
               )
-            : [...s.cart, { productId: id, quantity: 1 }];
+            : [...s.cart, { variantId, quantity: qty }];
           return { cart, cartOpen: open ? true : s.cartOpen };
         }),
-      removeFromCart: (id) =>
-        set((s) => ({ cart: s.cart.filter((c) => c.productId !== id) })),
-      updateQty: (id, qty) =>
+      removeFromCart: (variantId) =>
+        set((s) => ({ cart: s.cart.filter((c) => c.variantId !== variantId) })),
+      updateQty: (variantId, qty) =>
         set((s) => ({
-          cart: qty <= 0
-            ? s.cart.filter((c) => c.productId !== id)
-            : s.cart.map((c) => (c.productId === id ? { ...c, quantity: qty } : c)),
+          cart:
+            qty <= 0
+              ? s.cart.filter((c) => c.variantId !== variantId)
+              : s.cart.map((c) =>
+                  c.variantId === variantId ? { ...c, quantity: qty } : c,
+                ),
         })),
       clearCart: () => set({ cart: [] }),
-      toggleWishlist: (id) =>
+      replaceCart: (items) => set({ cart: items }),
+      toggleWishlist: (productId) =>
         set((s) => ({
-          wishlist: s.wishlist.includes(id)
-            ? s.wishlist.filter((x) => x !== id)
-            : [...s.wishlist, id],
+          wishlist: s.wishlist.includes(productId)
+            ? s.wishlist.filter((x) => x !== productId)
+            : [...s.wishlist, productId],
         })),
       setCartOpen: (cartOpen) => set({ cartOpen }),
       setLoginOpen: (loginOpen) => set({ loginOpen }),
       setMenuOpen: (menuOpen) => set({ menuOpen }),
       setSearchOpen: (searchOpen) => set({ searchOpen }),
     }),
-    { name: "lb-closet-shop", partialize: (s) => ({ cart: s.cart, wishlist: s.wishlist }) },
+    {
+      name: "lb-closet-shop",
+      version: 2,
+      partialize: (s) => ({ cart: s.cart, wishlist: s.wishlist }),
+    },
   ),
 );
 
-export function cartLines(cart: CartItem[]): Array<CartItem & { product: Product }> {
-  return cart
-    .map((c) => {
-      const product = allProducts.find((p) => p.id === c.productId);
-      return product ? { ...c, product } : null;
-    })
-    .filter(Boolean) as Array<CartItem & { product: Product }>;
+export function cartLines(cart: CartItem[], products: DbProduct[]): CartLine[] {
+  const out: CartLine[] = [];
+  for (const ci of cart) {
+    for (const p of products) {
+      const v = p.variants?.find((x) => x.id === ci.variantId);
+      if (v) {
+        out.push({ ...ci, product: p, variant: v });
+        break;
+      }
+    }
+  }
+  return out;
 }
 
-export function cartSubtotal(cart: CartItem[]): number {
-  return cartLines(cart).reduce((sum, l) => sum + l.product.price * l.quantity, 0);
+export function cartSubtotalCents(lines: CartLine[]): number {
+  return lines.reduce((s, l) => s + l.variant.price_cents * l.quantity, 0);
 }

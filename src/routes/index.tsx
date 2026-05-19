@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { homeProducts, allProducts, type Category } from "@/lib/catalog";
-import { ProductCard } from "@/components/ProductCard";
+import { useQuery } from "@tanstack/react-query";
 import slider1 from "@/assets/images/Slider-1.jpg";
 import slider2 from "@/assets/images/Slider-2.jpg";
 import slider3 from "@/assets/images/Slider-3.jpg";
@@ -9,30 +8,38 @@ import tileBolsas from "@/assets/images/01 - bolsas.jpg";
 import tileCarteiras from "@/assets/images/02 - carteiras.jpg";
 import tileBones from "@/assets/images/03 - bones.jpg";
 import tileCintos from "@/assets/images/04 - cintos.jpg";
+import { ProductCard } from "@/components/ProductCard";
+import { productsQuery } from "@/lib/products";
 
 export const Route = createFileRoute("/")({
+  loader: ({ context }) => {
+    context.queryClient.ensureQueryData(productsQuery());
+  },
   component: HomePage,
 });
 
 const heroSlides = [
-  { src: slider1, alt: "Banner principal Lb Closet", to: "/loja", search: { category: "Liqui" } },
-  { src: slider2, alt: "Banner secundário Lb Closet", to: "/loja", search: {} },
-  { src: slider3, alt: "Banner categoria Lb Closet", to: "/loja", search: { category: "Bolsas" } },
+  { src: slider1, alt: "Banner principal Lb Closet", to: "/loja" as const, search: {} },
+  { src: slider2, alt: "Banner secundário Lb Closet", to: "/loja" as const, search: {} },
+  { src: slider3, alt: "Banner categoria Lb Closet", to: "/loja" as const, search: { category: "bolsas" } },
 ];
 
-const categoryTiles: Array<{ label: string; img: string; cat: Category; dark?: boolean }> = [
-  { label: "Bolsas", img: tileBolsas, cat: "Bolsas" },
-  { label: "Carteiras", img: tileCarteiras, cat: "Carteiras" },
-  { label: "Bonés", img: tileBones, cat: "Bonés", dark: true },
-  { label: "Cintos", img: tileCintos, cat: "Cintos" },
+const categoryTiles = [
+  { label: "Bolsas", img: tileBolsas, slug: "bolsas" },
+  { label: "Carteiras", img: tileCarteiras, slug: "carteiras" },
+  { label: "Bonés", img: tileBones, slug: "bones", dark: true },
+  { label: "Cintos", img: tileCintos, slug: "cintos" },
 ];
 
 function HomePage() {
   const [hero, setHero] = useState(0);
+  const { data: products = [] } = useQuery(productsQuery());
   useEffect(() => {
     const t = setInterval(() => setHero((i) => (i + 1) % heroSlides.length), 6000);
     return () => clearInterval(t);
   }, []);
+
+  const featured = products.filter((p) => p.is_featured).slice(0, 8);
 
   return (
     <main id="top">
@@ -109,7 +116,7 @@ function HomePage() {
             key={t.label}
             className={`category-tile ${t.dark ? "category-tile-dark" : ""}`}
             to="/loja"
-            search={{ category: t.cat }}
+            search={{ category: t.slug }}
           >
             <span>{t.label}</span>
             <img src={t.img} alt={`Destaque de ${t.label.toLowerCase()}`} loading="lazy" decoding="async" />
@@ -117,38 +124,30 @@ function HomePage() {
         ))}
       </section>
 
-      {(["Bolsas", "Carteiras", "Cintos", "Bonés"] as Category[]).map((cat) => (
-        <CategorySection key={cat} category={cat} />
-      ))}
-    </main>
-  );
-}
+      {featured.length > 0 && (
+        <section className="featured-products" aria-labelledby="featured-destaques">
+          <div className="featured-products-inner">
+            <div className="featured-products-heading">
+              <p>Seleção especial</p>
+              <h2 id="featured-destaques">DESTAQUES</h2>
+            </div>
+            <div className="featured-products-grid">
+              {featured.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
-function CategorySection({ category }: { category: Category }) {
-  const products = allProducts.filter((p) => p.category === category).slice(0, 8);
-  const idMap: Record<Category, string> = {
-    Bolsas: "secao-bolsas",
-    Carteiras: "secao-carteiras",
-    Cintos: "secao-cintos",
-    Bonés: "secao-bones",
-  };
-  return (
-    <section
-      id={idMap[category]}
-      className="featured-products"
-      aria-labelledby={`featured-${category}`}
-    >
-      <div className="featured-products-inner">
-        <div className="featured-products-heading">
-          <p>Seleção especial</p>
-          <h2 id={`featured-${category}`}>{category}</h2>
-        </div>
-        <div className="featured-products-grid">
-          {products.length > 0
-            ? products.map((p) => <ProductCard key={p.id} product={p} />)
-            : homeProducts.map((p) => <ProductCard key={p.id} product={p} />)}
-        </div>
-      </div>
-    </section>
+      {products.length === 0 && (
+        <section style={{ padding: "80px 20px", textAlign: "center" }}>
+          <h2>Nenhum produto cadastrado ainda</h2>
+          <p style={{ color: "#999", marginTop: 12 }}>
+            Acesse o <Link to="/admin" style={{ textDecoration: "underline" }}>painel</Link> para adicionar seus primeiros produtos.
+          </p>
+        </section>
+      )}
+    </main>
   );
 }

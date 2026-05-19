@@ -1,12 +1,17 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { allProducts, filterProducts, type FilterState } from "@/lib/catalog";
+import { useQuery } from "@tanstack/react-query";
+import {
+  categoriesQuery,
+  displayPriceCents,
+  productsQuery,
+  type DbProduct,
+} from "@/lib/products";
 import { ProductCard } from "@/components/ProductCard";
 
 type LojaSearch = {
   category?: string;
   color?: string;
-  size?: string;
   material?: string;
   search?: string;
 };
@@ -15,64 +20,88 @@ export const Route = createFileRoute("/loja")({
   validateSearch: (s: Record<string, unknown>): LojaSearch => ({
     category: typeof s.category === "string" ? s.category : undefined,
     color: typeof s.color === "string" ? s.color : undefined,
-    size: typeof s.size === "string" ? s.size : undefined,
     material: typeof s.material === "string" ? s.material : undefined,
     search: typeof s.search === "string" ? s.search : undefined,
   }),
+  loader: ({ context }) => {
+    context.queryClient.ensureQueryData(productsQuery());
+    context.queryClient.ensureQueryData(categoriesQuery());
+  },
   head: () => ({
     meta: [
       { title: "Loja | Lb Closet" },
       {
         name: "description",
         content:
-          "Explore a coleção completa da Lb Closet. Filtre por categorias, cores, tamanhos e preços em uma experiência de compra premium.",
+          "Explore a coleção completa da Lb Closet. Filtre por categorias, cores e preços em uma experiência de compra premium.",
       },
     ],
   }),
   component: LojaPage,
 });
 
-const PER_PAGE = 8;
+const PER_PAGE = 12;
 
 function LojaPage() {
   const search = Route.useSearch();
-  const [filters, setFilters] = useState<FilterState>({
-    category: search.category ?? "",
-    color: search.color ?? "",
-    size: search.size ?? "",
-    materials: search.material ? [search.material] : [],
-    min: "",
-    max: "",
-    sort: "featured",
-    search: search.search ?? "",
-  });
+  const { data: products = [] } = useQuery(productsQuery());
+  const { data: categories = [] } = useQuery(categoriesQuery());
+
+  const [category, setCategory] = useState(search.category ?? "");
+  const [color, setColor] = useState(search.color ?? "");
+  const [materials, setMaterials] = useState<string[]>(search.material ? [search.material] : []);
+  const [min, setMin] = useState("");
+  const [max, setMax] = useState("");
+  const [sort, setSort] = useState("featured");
+  const [text, setText] = useState(search.search ?? "");
   const [page, setPage] = useState(1);
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  const filtered = useMemo(() => filterProducts(allProducts, filters), [filters]);
+  const colorOptions = useMemo(() => {
+    const set = new Map<string, string>();
+    for (const p of products)
+      for (const v of p.variants ?? [])
+        if (v.color) set.set(v.color.name, v.color.name);
+    return Array.from(set.values());
+  }, [products]);
+
+  const materialOptions = useMemo(() => {
+    const set = new Set<string>();
+    for (const p of products) if (p.material) set.add(p.material.name);
+    return Array.from(set.values());
+  }, [products]);
+
+  const filtered = useMemo(() => {
+    const lower = text.toLowerCase();
+    const minN = min ? Number(min) : undefined;
+    const maxN = max ? Number(max) : undefined;
+    const list = products.filter((p) => {
+      if (category && p.category?.slug !== category) return false;
+      if (color && !p.variants.some((v) => v.color?.name === color)) return false;
+      if (materials.length && !materials.includes(p.material?.name ?? "")) return false;
+      const price = displayPriceCents(p) / 100;
+      if (minN !== undefined && price < minN) return false;
+      if (maxN !== undefined && price > maxN) return false;
+      if (lower) {
+        const hay = `${p.name} ${p.sku_base ?? ""} ${p.category?.name ?? ""}`.toLowerCase();
+        if (!hay.includes(lower)) return false;
+      }
+      return true;
+    });
+    return [...list].sort((a: DbProduct, b: DbProduct) => {
+      if (sort === "priceAsc") return displayPriceCents(a) - displayPriceCents(b);
+      if (sort === "priceDesc") return displayPriceCents(b) - displayPriceCents(a);
+      if (sort === "featured") return Number(b.is_featured) - Number(a.is_featured);
+      return 0;
+    });
+  }, [products, category, color, materials, min, max, sort, text]);
+
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
   const currentPage = Math.min(page, totalPages);
   const visible = filtered.slice((currentPage - 1) * PER_PAGE, currentPage * PER_PAGE);
 
-  function toggleCategory(c: string) {
-    setFilters((f) => ({ ...f, category: f.category === c ? "" : c }));
-    setPage(1);
-  }
-  function toggleColor(c: string) {
-    setFilters((f) => ({ ...f, color: f.color === c ? "" : c }));
-    setPage(1);
-  }
-  function toggleSize(s: string) {
-    setFilters((f) => ({ ...f, size: f.size === s ? "" : s }));
-    setPage(1);
-  }
   function toggleMaterial(m: string) {
-    setFilters((f) => ({
-      ...f,
-      materials: f.materials.includes(m)
-        ? f.materials.filter((x) => x !== m)
-        : [...f.materials, m],
-    }));
+    setMaterials((mm) => (mm.includes(m) ? mm.filter((x) => x !== m) : [...mm, m]));
     setPage(1);
   }
 
@@ -93,66 +122,62 @@ function LojaPage() {
           </div>
           <h2 className="sidebar-title">FILTRO</h2>
 
-          <FilterAccordion label="CATEGORIAS">
-            <div className="filter-tags-grid">
-              {["Bolsas", "Carteiras", "Cintos", "Bonés"].map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  className={`filter-tag ${filters.category === c ? "active" : ""}`}
-                  onClick={() => toggleCategory(c)}
-                >
-                  {c.toUpperCase()}
-                </button>
-              ))}
-            </div>
-          </FilterAccordion>
+          {categories.length > 0 && (
+            <FilterAccordion label="CATEGORIAS">
+              <div className="filter-tags-grid">
+                {categories.map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    className={`filter-tag ${category === c.slug ? "active" : ""}`}
+                    onClick={() => {
+                      setCategory(category === c.slug ? "" : c.slug);
+                      setPage(1);
+                    }}
+                  >
+                    {c.name.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            </FilterAccordion>
+          )}
 
-          <FilterAccordion label="COR">
-            <div className="filter-tags-grid">
-              {["Preto", "Caramelo", "Marrom", "Off White"].map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  className={`filter-tag ${filters.color === c ? "active" : ""}`}
-                  onClick={() => toggleColor(c)}
-                >
-                  {c.toUpperCase()}
-                </button>
-              ))}
-            </div>
-          </FilterAccordion>
+          {colorOptions.length > 0 && (
+            <FilterAccordion label="COR">
+              <div className="filter-tags-grid">
+                {colorOptions.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    className={`filter-tag ${color === c ? "active" : ""}`}
+                    onClick={() => {
+                      setColor(color === c ? "" : c);
+                      setPage(1);
+                    }}
+                  >
+                    {c.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            </FilterAccordion>
+          )}
 
-          <FilterAccordion label="TAMANHO">
-            <div className="filter-tags-grid size-grid">
-              <button
-                type="button"
-                className={`filter-tag size-pill ${filters.size === "UN" ? "active" : ""}`}
-                onClick={() => toggleSize("UN")}
-              >
-                UN
-              </button>
-            </div>
-          </FilterAccordion>
-
-          <FilterAccordion label="GRUPO">
-            <div className="filter-tags-grid">
-              {[
-                { mat: "Couro", label: "Bolsas Couro" },
-                { mat: "Camurça", label: "Bolsas Camurça" },
-                { mat: "Algodão", label: "Bolsas Algodão" },
-              ].map((g) => (
-                <button
-                  key={g.mat}
-                  type="button"
-                  className={`filter-tag ${filters.materials.includes(g.mat) ? "active" : ""}`}
-                  onClick={() => toggleMaterial(g.mat)}
-                >
-                  {g.label}
-                </button>
-              ))}
-            </div>
-          </FilterAccordion>
+          {materialOptions.length > 0 && (
+            <FilterAccordion label="MATERIAL">
+              <div className="filter-tags-grid">
+                {materialOptions.map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    className={`filter-tag ${materials.includes(m) ? "active" : ""}`}
+                    onClick={() => toggleMaterial(m)}
+                  >
+                    {m}
+                  </button>
+                ))}
+              </div>
+            </FilterAccordion>
+          )}
 
           <FilterAccordion label="PREÇO">
             <div className="filter-price-range">
@@ -161,8 +186,8 @@ function LojaPage() {
                   type="number"
                   placeholder="Min"
                   className="price-input"
-                  value={filters.min}
-                  onChange={(e) => setFilters((f) => ({ ...f, min: e.target.value }))}
+                  value={min}
+                  onChange={(e) => setMin(e.target.value)}
                   aria-label="Preço mínimo"
                 />
                 <span>-</span>
@@ -170,8 +195,8 @@ function LojaPage() {
                   type="number"
                   placeholder="Max"
                   className="price-input"
-                  value={filters.max}
-                  onChange={(e) => setFilters((f) => ({ ...f, max: e.target.value }))}
+                  value={max}
+                  onChange={(e) => setMax(e.target.value)}
                   aria-label="Preço máximo"
                 />
               </div>
@@ -199,14 +224,12 @@ function LojaPage() {
               <label htmlFor="sort-select">CLASSIFICAR POR:</label>
               <select
                 id="sort-select"
-                value={filters.sort}
-                onChange={(e) => setFilters((f) => ({ ...f, sort: e.target.value }))}
+                value={sort}
+                onChange={(e) => setSort(e.target.value)}
               >
                 <option value="featured">MAIOR RELEVÂNCIA</option>
                 <option value="priceAsc">MENOR PREÇO</option>
                 <option value="priceDesc">MAIOR PREÇO</option>
-                <option value="discount">MAIOR DESCONTO</option>
-                <option value="new">NOVIDADES</option>
               </select>
             </div>
           </div>
@@ -216,7 +239,11 @@ function LojaPage() {
               <ProductCard key={p.id} product={p} variant="grid" />
             ))}
             {visible.length === 0 && (
-              <p style={{ padding: "40px 0", color: "#999" }}>Nenhum produto encontrado.</p>
+              <p style={{ padding: "40px 0", color: "#999" }}>
+                {text || category || color || materials.length
+                  ? "Nenhum produto encontrado com esses filtros."
+                  : "Catálogo vazio. Cadastre produtos no painel administrativo."}
+              </p>
             )}
           </div>
 
@@ -243,6 +270,9 @@ function LojaPage() {
           )}
         </div>
       </div>
+
+      {/* hidden controlled search */}
+      <input type="hidden" value={text} onChange={(e) => setText(e.target.value)} />
     </main>
   );
 }
