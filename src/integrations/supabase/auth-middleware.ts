@@ -1,6 +1,11 @@
 import { createMiddleware } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { createClient } from "@supabase/supabase-js";
+import {
+  getSupabasePublishableKey,
+  getSupabaseServiceRoleKey,
+  getSupabaseUrl,
+} from "./env.server";
 
 /**
  * Lê o Bearer token do request, valida com a service role e
@@ -15,9 +20,9 @@ export const requireSupabaseAuth = createMiddleware({ type: "function" }).server
     }
     const token = authHeader.slice(7);
 
-    const url = process.env.LB_SUPABASE_URL!;
-    const publishable = process.env.LB_SUPABASE_PUBLISHABLE_KEY!;
-    const service = process.env.LB_SUPABASE_SERVICE_ROLE_KEY!;
+    const url = getSupabaseUrl();
+    const publishable = getSupabasePublishableKey();
+    const service = getSupabaseServiceRoleKey();
 
     // valida o token
     const admin = createClient(url, service, { auth: { persistSession: false } });
@@ -54,8 +59,8 @@ export const requireStaff = createMiddleware({ type: "function" })
     }
     const token = authHeader.slice(7);
     const admin = createClient(
-      process.env.LB_SUPABASE_URL!,
-      process.env.LB_SUPABASE_SERVICE_ROLE_KEY!,
+      getSupabaseUrl(),
+      getSupabaseServiceRoleKey(),
       { auth: { persistSession: false } },
     );
     const { data: userData, error } = await admin.auth.getUser(token);
@@ -69,8 +74,8 @@ export const requireStaff = createMiddleware({ type: "function" })
     if (!hasStaff) throw new Response("Forbidden", { status: 403 });
 
     const supabase = createClient(
-      process.env.LB_SUPABASE_URL!,
-      process.env.LB_SUPABASE_PUBLISHABLE_KEY!,
+      getSupabaseUrl(),
+      getSupabasePublishableKey(),
       {
         auth: { persistSession: false },
         global: { headers: { Authorization: `Bearer ${token}` } },
