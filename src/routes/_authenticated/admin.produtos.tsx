@@ -63,6 +63,13 @@ async function fetchProducts(q: string) {
 }
 
 async function fetchCategories() {
+  // Garante que as 4 categorias padrão existam
+  await supabase
+    .from("categories")
+    .upsert(
+      DEFAULT_CATEGORIES.map((c, i) => ({ ...c, sort_order: i, is_active: true })),
+      { onConflict: "slug", ignoreDuplicates: true },
+    );
   const { data, error } = await supabase
     .from("categories")
     .select("id, name")
