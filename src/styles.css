@@ -2,6 +2,7 @@
 @source "../src";
 @import "tw-animate-css";
 @import "./lb-closet.css";
+@import "./styles/admin-design-system.css";
 
 @custom-variant dark (&:is(.dark *));
 
