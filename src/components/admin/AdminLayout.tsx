@@ -12,14 +12,15 @@ import {
   LogOut,
 } from "lucide-react";
 
-const nav = [
+const nav: Array<{ to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }> = [
   { to: "/admin", label: "Visão geral", icon: LayoutDashboard, exact: true },
   { to: "/admin/produtos", label: "Produtos", icon: Package },
   { to: "/admin/pedidos", label: "Pedidos", icon: ShoppingBag },
   { to: "/admin/clientes", label: "Clientes", icon: Users },
   { to: "/admin/categorias", label: "Categorias", icon: Tags },
   { to: "/admin/conteudo", label: "Conteúdo", icon: ImageIcon },
-] as const;
+];
+
 
 export function AdminLayout() {
   const path = useRouterState({ select: (s) => s.location.pathname });
