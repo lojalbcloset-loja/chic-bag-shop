@@ -70,11 +70,17 @@ function ConteudoPage() {
     }
   };
 
+  const MAX_SLIDES = 7;
+  const total = data?.length ?? 0;
+  const reachedLimit = total >= MAX_SLIDES;
+
   const create = async () => {
     if (!imageUrl) return toast.error("Carregue uma imagem");
+    if (reachedLimit) return toast.error(`Limite de ${MAX_SLIDES} banners atingido`);
     const { error } = await supabase.from("hero_slides").insert({
       image_url: imageUrl,
       cta_href: ctaHref.trim() || null,
+      sort_order: total,
     });
     if (error) return toast.error(error.message);
     toast.success("Banner criado");
