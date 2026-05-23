@@ -96,7 +96,7 @@ function AdminHome() {
       </div>
 
       {/* Main grid: tabela + spotlight */}
-      <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
+      <div className="grid gap-4 lg:grid-cols-3">
         {/* Pedidos recentes */}
         <div className="ads-card">
           <div className="flex items-center justify-between mb-4">
