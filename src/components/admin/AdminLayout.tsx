@@ -51,7 +51,7 @@ export function AdminLayout() {
 
   return (
     <div className="ads-shell min-h-screen flex">
-      <aside className="ads-sidebar flex-col shrink-0" style={{ display: "flex" }}>
+      <aside className="ads-sidebar">
         {/* Brand */}
         <div className="ads-brand">
           <img src={logoUrl} alt="LB Closet" className="h-9 w-auto object-contain" />
