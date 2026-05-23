@@ -20,6 +20,7 @@ const nav: Array<{ to: string; label: string; icon: typeof LayoutDashboard; exac
   { to: "/admin/clientes", label: "Clientes", icon: Users },
   { to: "/admin/categorias", label: "Categorias", icon: Tags },
   { to: "/admin/conteudo", label: "Conteúdo", icon: ImageIcon },
+  { to: "/admin/configuracoes", label: "Configurações", icon: Settings },
 ];
 
 
