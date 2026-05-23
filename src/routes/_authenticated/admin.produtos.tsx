@@ -36,7 +36,12 @@ type ProductRow = {
   images: { url: string; is_primary: boolean; sort_order: number }[];
 };
 
-const TIPOS = ["Bolsa", "Vestido", "Blusa", "Calça", "Saia", "Sapato", "Acessório", "Conjunto"];
+const DEFAULT_CATEGORIES = [
+  { name: "Bolsas", slug: "bolsas" },
+  { name: "Carteiras", slug: "carteiras" },
+  { name: "Cintos", slug: "cintos" },
+  { name: "Bonés", slug: "bones" },
+];
 const MAX_IMAGES = 6;
 const IMG_RECOMMEND = "1200×1600px · proporção 3:4 · JPG, PNG ou WEBP";
 
