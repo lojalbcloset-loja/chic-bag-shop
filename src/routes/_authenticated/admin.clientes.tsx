@@ -17,9 +17,28 @@ type Profile = {
 };
 
 async function fetchCustomers(q: string) {
+  // Excluir staff (admin/manager) — clientes só são quem comprou na loja
+  const { data: staff } = await supabase
+    .from("user_roles")
+    .select("user_id")
+    .in("role", ["admin", "manager"]);
+  const staffIds = (staff ?? []).map((r) => r.user_id as string);
+
+  // Só lista perfis que tenham ao menos 1 pedido (cadastrados no checkout)
+  const { data: orderUsers, error: ordErr } = await supabase
+    .from("orders")
+    .select("user_id")
+    .not("user_id", "is", null);
+  if (ordErr) throw ordErr;
+  const customerIds = Array.from(
+    new Set((orderUsers ?? []).map((o) => o.user_id as string).filter((id) => !staffIds.includes(id))),
+  );
+  if (customerIds.length === 0) return [] as Profile[];
+
   let query = supabase
     .from("profiles")
     .select("id,full_name,phone,created_at")
+    .in("id", customerIds)
     .order("created_at", { ascending: false })
     .limit(300);
   if (q) query = query.ilike("full_name", `%${q}%`);
