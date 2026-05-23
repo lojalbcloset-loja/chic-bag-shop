@@ -108,17 +108,26 @@ function ConteudoPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Conteúdo</h1>
-          <p className="text-sm text-muted-foreground">Banners e sliders da loja</p>
+          <p className="text-sm text-muted-foreground">
+            Banners e sliders da loja · {total}/{MAX_SLIDES}
+          </p>
         </div>
         <Dialog
           open={open}
           onOpenChange={(o) => {
+            if (o && reachedLimit) {
+              toast.error(`Limite de ${MAX_SLIDES} banners atingido`);
+              return;
+            }
             setOpen(o);
             if (!o) reset();
           }}
         >
           <DialogTrigger asChild>
-            <Button className="!bg-[#3F2424] hover:!bg-[#694141]">
+            <Button
+              disabled={reachedLimit}
+              className="!bg-[#3F2424] hover:!bg-[#694141]"
+            >
               <Plus className="h-4 w-4 mr-1" /> Novo banner
             </Button>
           </DialogTrigger>
