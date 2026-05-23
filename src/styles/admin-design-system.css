@@ -1,0 +1,274 @@
+/* ============================================================
+   ADMIN DESIGN SYSTEM — LB Closet
+   Inspirado no layout do dashboard "Niond" (sidebar clara,
+   cards pastéis, painel escuro de destaque, cantos arredondados,
+   sombras suaves), adaptado às cores oficiais do projeto.
+
+   Paleta principal do projeto:
+   - Marrom escuro (primary):  #3F2424
+   - Marrom médio (warm):       #66504a
+   - Bege / surface:            #f5f1ec
+   - Branco card:               #ffffff
+   - Texto principal:           #2b1a1a
+   - Texto muted:               #8a7a75
+
+   Como usar:
+   - Aplique as classes utilitárias `.ads-*` em telas do /admin.
+   - Os tokens (--ads-*) podem ser consumidos em qualquer
+     componente do painel via var(--ads-token).
+   ============================================================ */
+
+:root {
+  /* ----- Surfaces ----- */
+  --ads-bg:            #ece6df;          /* fundo geral do painel (bege quente) */
+  --ads-sidebar-bg:    #f5f1ec;          /* barra lateral, mais clara que o bg  */
+  --ads-card-bg:       #ffffff;          /* card padrão                         */
+  --ads-card-muted-bg: #faf7f3;          /* card secundário                     */
+  --ads-panel-dark-bg: #2b1a1a;          /* painel escuro de destaque (Upgrade) */
+
+  /* ----- Brand ----- */
+  --ads-primary:           #3F2424;      /* marrom oficial                      */
+  --ads-primary-hover:     #582f2f;
+  --ads-primary-foreground:#ffffff;
+  --ads-accent:            #c8a87a;      /* dourado quente para CTAs no escuro  */
+  --ads-accent-foreground: #2b1a1a;
+
+  /* ----- Texto ----- */
+  --ads-text:        #2b1a1a;
+  --ads-text-muted:  #8a7a75;
+  --ads-text-onDark: #f5f1ec;
+
+  /* ----- Bordas ----- */
+  --ads-border:        #e7ddd2;
+  --ads-border-strong: #d4c6b8;
+
+  /* ----- Stat cards (versão "soft" das pastéis do mock) ----- */
+  --ads-stat-1-bg: #f1e7da;  --ads-stat-1-fg: #5a3a1f;  /* areia      */
+  --ads-stat-2-bg: #f4dcd4;  --ads-stat-2-fg: #6b2f24;  /* terracota  */
+  --ads-stat-3-bg: #e3e7d8;  --ads-stat-3-fg: #3d4a25;  /* oliva      */
+  --ads-stat-4-bg: #ead9c2;  --ads-stat-4-fg: #5b3a17;  /* mostarda   */
+
+  /* ----- Radius ----- */
+  --ads-radius-sm: 10px;
+  --ads-radius-md: 14px;
+  --ads-radius-lg: 20px;
+  --ads-radius-pill: 999px;
+
+  /* ----- Sombras (sutis, igual ao mock) ----- */
+  --ads-shadow-xs: 0 1px 2px rgba(43, 26, 26, 0.04);
+  --ads-shadow-sm: 0 2px 8px rgba(43, 26, 26, 0.05);
+  --ads-shadow-md: 0 8px 24px rgba(43, 26, 26, 0.07);
+  --ads-shadow-lg: 0 16px 40px rgba(43, 26, 26, 0.10);
+
+  /* ----- Tipografia ----- */
+  --ads-font: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  --ads-fs-display: 28px;
+  --ads-fs-h1:      22px;
+  --ads-fs-h2:      18px;
+  --ads-fs-body:    14px;
+  --ads-fs-small:   12px;
+  --ads-fs-micro:   11px;
+  --ads-tracking-eyebrow: 0.12em;
+
+  /* ----- Layout ----- */
+  --ads-sidebar-w: 240px;
+  --ads-gap:       24px;
+  --ads-pad:       20px;
+}
+
+/* ============================================================
+   Layout helpers
+   ============================================================ */
+.ads-shell {
+  background: var(--ads-bg);
+  min-height: 100vh;
+  font-family: var(--ads-font);
+  color: var(--ads-text);
+}
+
+.ads-eyebrow {
+  font-size: var(--ads-fs-micro);
+  font-weight: 700;
+  letter-spacing: var(--ads-tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--ads-text-muted);
+}
+
+.ads-h1 {
+  font-size: var(--ads-fs-display);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ads-text);
+  line-height: 1.15;
+}
+.ads-h2 {
+  font-size: var(--ads-fs-h2);
+  font-weight: 600;
+  color: var(--ads-text);
+}
+.ads-muted { color: var(--ads-text-muted); }
+
+/* ============================================================
+   Cards
+   ============================================================ */
+.ads-card {
+  background: var(--ads-card-bg);
+  border-radius: var(--ads-radius-lg);
+  padding: var(--ads-pad);
+  box-shadow: var(--ads-shadow-sm);
+  border: 1px solid var(--ads-border);
+}
+.ads-card--flat   { box-shadow: none; }
+.ads-card--muted  { background: var(--ads-card-muted-bg); }
+.ads-card--dark   {
+  background: var(--ads-panel-dark-bg);
+  color: var(--ads-text-onDark);
+  border-color: transparent;
+}
+
+/* Stat cards pastel */
+.ads-stat       { border-radius: var(--ads-radius-lg); padding: 18px 20px; }
+.ads-stat--1    { background: var(--ads-stat-1-bg); color: var(--ads-stat-1-fg); }
+.ads-stat--2    { background: var(--ads-stat-2-bg); color: var(--ads-stat-2-fg); }
+.ads-stat--3    { background: var(--ads-stat-3-bg); color: var(--ads-stat-3-fg); }
+.ads-stat--4    { background: var(--ads-stat-4-bg); color: var(--ads-stat-4-fg); }
+.ads-stat .ads-stat__value { font-size: 28px; font-weight: 700; line-height: 1.1; }
+.ads-stat .ads-stat__label { font-size: 12px; opacity: 0.75; margin-bottom: 8px; }
+
+/* ============================================================
+   Sidebar / menu (espelha o padrão do mock)
+   ============================================================ */
+.ads-sidebar {
+  width: var(--ads-sidebar-w);
+  background: var(--ads-sidebar-bg);
+  border-right: 1px solid var(--ads-border);
+  padding: 20px 14px;
+}
+.ads-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--ads-radius-md);
+  font-size: var(--ads-fs-body);
+  color: var(--ads-text);
+  transition: background-color .15s ease, color .15s ease;
+}
+.ads-nav-item:hover { background: rgba(63, 36, 36, 0.06); }
+.ads-nav-item.is-active {
+  background: var(--ads-primary);
+  color: var(--ads-primary-foreground);
+  font-weight: 600;
+  box-shadow: var(--ads-shadow-sm);
+}
+.ads-nav-item.is-active svg { color: var(--ads-primary-foreground); }
+
+/* ============================================================
+   Botões
+   ============================================================ */
+.ads-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 16px;
+  border-radius: var(--ads-radius-pill);
+  font-size: var(--ads-fs-small);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition: background-color .15s ease, transform .1s ease;
+  border: 0;
+}
+.ads-btn--primary {
+  background: var(--ads-primary);
+  color: var(--ads-primary-foreground);
+}
+.ads-btn--primary:hover { background: var(--ads-primary-hover); }
+.ads-btn--accent {
+  background: var(--ads-accent);
+  color: var(--ads-accent-foreground);
+}
+.ads-btn--ghost {
+  background: transparent;
+  color: var(--ads-text);
+  border: 1px solid var(--ads-border-strong);
+}
+
+/* ============================================================
+   Tabela leve (estilo "Top Store" do mock)
+   ============================================================ */
+.ads-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 6px;
+  font-size: var(--ads-fs-body);
+}
+.ads-table thead th {
+  text-align: left;
+  font-size: var(--ads-fs-micro);
+  font-weight: 700;
+  letter-spacing: var(--ads-tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--ads-text-muted);
+  padding: 8px 12px;
+}
+.ads-table tbody td {
+  background: var(--ads-card-bg);
+  padding: 14px 12px;
+  border-top: 1px solid var(--ads-border);
+  border-bottom: 1px solid var(--ads-border);
+}
+.ads-table tbody tr td:first-child { border-left: 1px solid var(--ads-border); border-radius: var(--ads-radius-md) 0 0 var(--ads-radius-md); }
+.ads-table tbody tr td:last-child  { border-right:1px solid var(--ads-border); border-radius: 0 var(--ads-radius-md) var(--ads-radius-md) 0; }
+
+/* ============================================================
+   Badges / chips
+   ============================================================ */
+.ads-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: var(--ads-radius-pill);
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--ads-stat-3-bg);
+  color: var(--ads-stat-3-fg);
+}
+.ads-badge--warn { background: var(--ads-stat-4-bg); color: var(--ads-stat-4-fg); }
+.ads-badge--danger{ background: #f3d2cc; color: #7a2a1f; }
+.ads-badge--info  { background: var(--ads-stat-1-bg); color: var(--ads-stat-1-fg); }
+
+/* ============================================================
+   Inputs
+   ============================================================ */
+.ads-input {
+  height: 40px;
+  padding: 0 14px;
+  background: var(--ads-card-bg);
+  border: 1px solid var(--ads-border);
+  border-radius: var(--ads-radius-md);
+  font-size: var(--ads-fs-body);
+  color: var(--ads-text);
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.ads-input:focus {
+  border-color: var(--ads-primary);
+  box-shadow: 0 0 0 3px rgba(63, 36, 36, 0.10);
+}
+
+/* ============================================================
+   Painel de destaque escuro (estilo "Upgrade to Pro")
+   ============================================================ */
+.ads-spotlight {
+  background: linear-gradient(160deg, #2b1a1a 0%, #3F2424 100%);
+  color: var(--ads-text-onDark);
+  border-radius: var(--ads-radius-lg);
+  padding: 22px;
+  box-shadow: var(--ads-shadow-md);
+}
+.ads-spotlight h3 { font-size: 16px; font-weight: 600; margin: 0 0 6px; }
+.ads-spotlight p  { font-size: 12px; opacity: .75; margin: 0 0 14px; }
