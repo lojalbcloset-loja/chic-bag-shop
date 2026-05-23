@@ -4,15 +4,94 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/use-auth";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/configuracoes")({
   component: ConfiguracoesPage,
 });
 
 function ConfiguracoesPage() {
+  const { user } = useAuth();
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    setLoading(true);
+    supabase
+      .from("profiles")
+      .select("full_name,phone")
+      .eq("id", user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        setFullName(data?.full_name ?? "");
+        setPhone(data?.phone ?? "");
+        setLoading(false);
+      });
+  }, [user]);
+
+  async function saveProfile() {
+    if (!user) return;
+    setSaving(true);
+    const { error } = await supabase
+      .from("profiles")
+      .upsert({ id: user.id, full_name: fullName, phone });
+    setSaving(false);
+    if (error) toast.error("Erro ao salvar perfil");
+    else toast.success("Perfil atualizado");
+  }
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold tracking-tight">Configurações</h1>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Perfil</CardTitle>
+          <CardDescription>Seus dados como administrador da loja.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="profile-name">Nome completo</Label>
+              <Input
+                id="profile-name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                disabled={loading}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="profile-email">E-mail</Label>
+              <Input id="profile-email" type="email" value={user?.email ?? ""} disabled />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="profile-phone">Telefone</Label>
+              <Input
+                id="profile-phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                disabled={loading}
+                placeholder="(00) 00000-0000"
+              />
+            </div>
+          </div>
+          <div className="flex justify-end">
+            <Button
+              onClick={saveProfile}
+              disabled={saving || loading}
+              className="!bg-[#3F2424] hover:!bg-[#694141]"
+            >
+              {saving ? "Salvando…" : "Salvar perfil"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
