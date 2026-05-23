@@ -4,11 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated")({
-  // gate só roda no cliente porque session é client-side
-  beforeLoad: async () => {
+  beforeLoad: async ({ location }) => {
     if (typeof window === "undefined") return;
     const { data } = await supabase.auth.getSession();
     if (!data.session) {
+      // Acessos ao painel -> tela de login do painel
+      if (location.pathname.startsWith("/admin")) {
+        throw redirect({ to: "/painel" });
+      }
       throw redirect({ to: "/", search: { login: 1 } as never });
     }
   },
@@ -27,6 +30,11 @@ function AuthenticatedLayout() {
 
   if (loading) return <div className="container py-16 text-center text-muted-foreground">Carregando…</div>;
   if (!isAuthenticated) return null;
+
+  // Páginas /admin/* têm o próprio layout (sidebar do painel)
+  if (path.startsWith("/admin")) {
+    return <Outlet />;
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10">
