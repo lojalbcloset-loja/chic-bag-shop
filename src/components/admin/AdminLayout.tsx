@@ -19,7 +19,7 @@ const nav: Array<{ to: string; label: string; icon: typeof LayoutDashboard; exac
   { to: "/admin/pedidos", label: "Pedidos", icon: ShoppingBag },
   { to: "/admin/clientes", label: "Clientes", icon: Users },
   { to: "/admin/categorias", label: "Categorias", icon: Tags },
-  { to: "/admin/conteudo", label: "Conteúdo", icon: ImageIcon },
+  { to: "/admin/conteudo", label: "Slider-Banners", icon: ImageIcon },
   { to: "/admin/configuracoes", label: "Configurações", icon: Settings },
 ];
 
