@@ -430,28 +430,28 @@ function ProductFormDialog({ onClose, onSaved }: { onClose: () => void; onSaved:
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Tipo de produto</Label>
+              <Label>Material do produto</Label>
               <Input
-                list="tipo-list"
                 value={f.productType}
                 onChange={(e) => set("productType", e.target.value)}
-                placeholder="Ex: Bolsa, Vestido, Sapato…"
+                placeholder="Ex: Bolsa 100% em Couro ..."
               />
-              <datalist id="tipo-list">
-                {TIPOS.map((t) => <option key={t} value={t} />)}
-              </datalist>
             </div>
             <div className="space-y-2">
               <Label>Slug (URL)</Label>
               <Input
                 value={f.slug}
                 onChange={(e) => set("slug", e.target.value)}
-                placeholder="bolsa-louis-vuitton"
+                placeholder="Gerado automaticamente a partir do nome"
               />
             </div>
             <div className="space-y-2">
               <Label>SKU</Label>
-              <Input value={f.sku} onChange={(e) => set("sku", e.target.value)} placeholder="Gerado automaticamente se vazio" />
+              <Input
+                value={f.sku}
+                onChange={(e) => set("sku", e.target.value)}
+                placeholder="Gerado automaticamente se vazio"
+              />
             </div>
             <div className="space-y-2 sm:col-span-2">
               <Label>Marca (opcional)</Label>
