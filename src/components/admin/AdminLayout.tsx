@@ -47,13 +47,16 @@ export function AdminLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-muted/30 grid md:grid-cols-[240px_1fr]">
-      <aside className="hidden md:flex flex-col border-r bg-card">
-        <div className="px-5 py-5 border-b flex items-center gap-3">
-          <img src={logoUrl} alt="LB Closet" className="h-9 w-auto object-contain" />
-          <div className="text-sm font-semibold tracking-tight">Painel</div>
+    <div className="ads-shell min-h-screen grid md:grid-cols-[240px_1fr]">
+      <aside className="ads-sidebar hidden md:flex flex-col">
+        <div className="px-2 py-3 mb-3 flex items-center gap-3">
+          <img src={logoUrl} alt="LB Closet" className="h-10 w-auto object-contain" />
+          <div>
+            <div className="text-[11px] uppercase tracking-[0.12em] ads-muted">LB Closet</div>
+            <div className="text-sm font-semibold">Painel</div>
+          </div>
         </div>
-        <nav className="flex-1 p-3 space-y-1">
+        <nav className="flex-1 space-y-1">
           {nav.map((it) => {
             const active = it.exact ? path === it.to : path === it.to || path.startsWith(it.to + "/");
             const Icon = it.icon;
@@ -61,12 +64,7 @@ export function AdminLayout() {
               <Link
                 key={it.to}
                 to={it.to}
-                className={cn(
-                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
-                  active
-                    ? "bg-[#3F2424] !text-white font-medium [&_svg]:!text-white"
-                    : "text-foreground hover:bg-accent",
-                )}
+                className={cn("ads-nav-item", active && "is-active")}
               >
                 <Icon className="h-4 w-4" />
                 {it.label}
@@ -74,8 +72,8 @@ export function AdminLayout() {
             );
           })}
         </nav>
-        <div className="p-3 border-t space-y-2">
-          <div className="px-3 text-xs text-muted-foreground truncate" title={user?.email ?? ""}>
+        <div className="mt-3 pt-3 border-t" style={{ borderColor: "var(--ads-border)" }}>
+          <div className="px-3 text-xs ads-muted truncate" title={user?.email ?? ""}>
             {user?.email}
           </div>
           <button
@@ -83,12 +81,13 @@ export function AdminLayout() {
               await signOut();
               navigate({ to: "/painel" });
             }}
-            className="w-full flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-accent transition-colors text-muted-foreground"
+            className="ads-nav-item w-full mt-2"
           >
             <LogOut className="h-4 w-4" /> Sair
           </button>
         </div>
       </aside>
+
 
       {/* Mobile top bar */}
       <div className="md:hidden flex items-center justify-between border-b bg-card px-4 py-3">
