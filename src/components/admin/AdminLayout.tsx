@@ -9,6 +9,7 @@ import {
   Users,
   Tags,
   Image as ImageIcon,
+  Settings,
   LogOut,
 } from "lucide-react";
 
