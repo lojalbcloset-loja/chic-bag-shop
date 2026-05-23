@@ -47,8 +47,8 @@ export function AdminLayout() {
   }
 
   return (
-    <div className="ads-shell min-h-screen grid md:grid-cols-[240px_1fr]">
-      <aside className="ads-sidebar hidden md:flex flex-col">
+    <div className="ads-shell min-h-screen flex">
+      <aside className="ads-sidebar hidden md:flex flex-col shrink-0">
         <div className="px-2 py-3 mb-3 flex items-center gap-3">
           <img src={logoUrl} alt="LB Closet" className="h-10 w-auto object-contain" />
           <div>
