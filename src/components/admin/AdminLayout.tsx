@@ -64,7 +64,7 @@ export function AdminLayout() {
                 className={cn(
                   "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
                   active
-                    ? "bg-[#3F2424] text-white"
+                    ? "bg-[#3F2424] !text-white font-medium [&_svg]:!text-white"
                     : "text-foreground hover:bg-accent",
                 )}
               >
@@ -115,7 +115,7 @@ export function AdminLayout() {
                   to={it.to}
                   className={cn(
                     "rounded-md px-3 py-1.5 text-xs whitespace-nowrap",
-                    active ? "bg-[#3F2424] text-white" : "text-foreground hover:bg-accent",
+                    active ? "bg-[#3F2424] !text-white font-medium" : "text-foreground hover:bg-accent",
                   )}
                 >
                   {it.label}
