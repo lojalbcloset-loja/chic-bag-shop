@@ -121,7 +121,8 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const router = useRouter();
-  const isPainel = router.state.location.pathname === "/painel";
+  const path = router.state.location.pathname;
+  const isPainel = path === "/painel" || path.startsWith("/admin");
 
   return (
     <>
