@@ -120,18 +120,21 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+  const router = useRouter();
+  const isPainel = router.state.location.pathname === "/painel";
+
   return (
     <>
       <CartSyncBridge />
-      <PromoBar />
-      <Header />
+      {!isPainel && <PromoBar />}
+      {!isPainel && <Header />}
       <main>
         <Outlet />
       </main>
-      <Footer />
-      <WhatsappFab />
-      <CartDrawer />
-      <LoginDrawer />
+      {!isPainel && <Footer />}
+      {!isPainel && <WhatsappFab />}
+      {!isPainel && <CartDrawer />}
+      {!isPainel && <LoginDrawer />}
       <Toaster />
     </>
   );

@@ -95,7 +95,7 @@ function PainelLoginPage() {
 
               <Button
                 type="submit"
-                className="w-full h-11 text-base font-medium"
+                className="w-full h-11 text-base font-medium !bg-[#3F2424] hover:!bg-[#694141]"
                 disabled={loading}
               >
                 {loading ? "Entrando…" : "Entrar"}
