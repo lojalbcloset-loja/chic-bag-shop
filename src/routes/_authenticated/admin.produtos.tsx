@@ -36,7 +36,12 @@ type ProductRow = {
   images: { url: string; is_primary: boolean; sort_order: number }[];
 };
 
-const TIPOS = ["Bolsa", "Vestido", "Blusa", "Calça", "Saia", "Sapato", "Acessório", "Conjunto"];
+const DEFAULT_CATEGORIES = [
+  { name: "Bolsas", slug: "bolsas" },
+  { name: "Carteiras", slug: "carteiras" },
+  { name: "Cintos", slug: "cintos" },
+  { name: "Bonés", slug: "bones" },
+];
 const MAX_IMAGES = 6;
 const IMG_RECOMMEND = "1200×1600px · proporção 3:4 · JPG, PNG ou WEBP";
 
@@ -58,6 +63,13 @@ async function fetchProducts(q: string) {
 }
 
 async function fetchCategories() {
+  // Garante que as 4 categorias padrão existam
+  await supabase
+    .from("categories")
+    .upsert(
+      DEFAULT_CATEGORIES.map((c, i) => ({ ...c, sort_order: i, is_active: true })),
+      { onConflict: "slug", ignoreDuplicates: true },
+    );
   const { data, error } = await supabase
     .from("categories")
     .select("id, name")
@@ -418,28 +430,28 @@ function ProductFormDialog({ onClose, onSaved }: { onClose: () => void; onSaved:
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Tipo de produto</Label>
+              <Label>Material do produto</Label>
               <Input
-                list="tipo-list"
                 value={f.productType}
                 onChange={(e) => set("productType", e.target.value)}
-                placeholder="Ex: Bolsa, Vestido, Sapato…"
+                placeholder="Ex: Bolsa 100% em Couro ..."
               />
-              <datalist id="tipo-list">
-                {TIPOS.map((t) => <option key={t} value={t} />)}
-              </datalist>
             </div>
             <div className="space-y-2">
               <Label>Slug (URL)</Label>
               <Input
                 value={f.slug}
                 onChange={(e) => set("slug", e.target.value)}
-                placeholder="bolsa-louis-vuitton"
+                placeholder="Gerado automaticamente a partir do nome"
               />
             </div>
             <div className="space-y-2">
               <Label>SKU</Label>
-              <Input value={f.sku} onChange={(e) => set("sku", e.target.value)} placeholder="Gerado automaticamente se vazio" />
+              <Input
+                value={f.sku}
+                onChange={(e) => set("sku", e.target.value)}
+                placeholder="Gerado automaticamente se vazio"
+              />
             </div>
             <div className="space-y-2 sm:col-span-2">
               <Label>Marca (opcional)</Label>
