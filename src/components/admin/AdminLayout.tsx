@@ -23,7 +23,6 @@ const nav: Array<{ to: string; label: string; icon: typeof LayoutDashboard; exac
   { to: "/admin/configuracoes", label: "Configurações", icon: Settings },
 ];
 
-
 export function AdminLayout() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
@@ -46,17 +45,24 @@ export function AdminLayout() {
     );
   }
 
+  const email = user?.email ?? "";
+  const initial = (email[0] ?? "L").toUpperCase();
+  const name = email.split("@")[0] || "Administrador";
+
   return (
     <div className="ads-shell min-h-screen flex">
       <aside className="ads-sidebar hidden md:flex flex-col shrink-0">
-        <div className="px-2 py-3 mb-3 flex items-center gap-3">
-          <img src={logoUrl} alt="LB Closet" className="h-10 w-auto object-contain" />
-          <div>
-            <div className="text-[11px] uppercase tracking-[0.12em] ads-muted">LB Closet</div>
-            <div className="text-sm font-semibold">Painel</div>
+        {/* Brand */}
+        <div className="ads-brand">
+          <img src={logoUrl} alt="LB Closet" className="h-9 w-auto object-contain" />
+          <div className="leading-tight">
+            <div className="ads-brand__name">LB Closet</div>
+            <div className="ads-brand__tag">Painel</div>
           </div>
         </div>
-        <nav className="flex-1 space-y-1">
+
+        {/* Nav */}
+        <nav className="ads-nav flex-1">
           {nav.map((it) => {
             const active = it.exact ? path === it.to : path === it.to || path.startsWith(it.to + "/");
             const Icon = it.icon;
@@ -66,31 +72,36 @@ export function AdminLayout() {
                 to={it.to}
                 className={cn("ads-nav-item", active && "is-active")}
               >
-                <Icon className="h-4 w-4" />
-                {it.label}
+                <Icon className="h-[18px] w-[18px] shrink-0" />
+                <span className="truncate">{it.label}</span>
               </Link>
             );
           })}
         </nav>
-        <div className="mt-3 pt-3 border-t" style={{ borderColor: "var(--ads-border)" }}>
-          <div className="px-3 text-xs ads-muted truncate" title={user?.email ?? ""}>
-            {user?.email}
+
+        {/* Profile + logout */}
+        <div className="ads-sidebar__footer">
+          <div className="ads-profile">
+            <div className="ads-avatar">{initial}</div>
+            <div className="min-w-0">
+              <div className="ads-profile__name truncate">{name}</div>
+              <div className="ads-profile__role truncate">Administrador</div>
+            </div>
           </div>
           <button
             onClick={async () => {
               await signOut();
               navigate({ to: "/painel" });
             }}
-            className="ads-nav-item w-full mt-2"
+            className="ads-logout"
           >
-            <LogOut className="h-4 w-4" /> Sair
+            <LogOut className="h-4 w-4" /> Log Out
           </button>
         </div>
       </aside>
 
-
       {/* Mobile top bar */}
-      <div className="md:hidden flex items-center justify-between border-b bg-card px-4 py-3">
+      <div className="md:hidden flex items-center justify-between border-b bg-card px-4 py-3 w-full">
         <div className="flex items-center gap-2">
           <img src={logoUrl} alt="LB Closet" className="h-8 w-auto" />
           <span className="text-sm font-semibold">Painel</span>
