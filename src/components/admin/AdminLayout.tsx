@@ -103,7 +103,7 @@ export function AdminLayout() {
         </button>
       </div>
 
-      <main className="min-w-0">
+      <main className="flex-1 min-w-0">
         <div className="md:hidden border-b bg-card overflow-x-auto">
           <div className="flex gap-1 p-2 min-w-max">
             {nav.map((it) => {
