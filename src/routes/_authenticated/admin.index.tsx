@@ -8,18 +8,21 @@ export const Route = createFileRoute("/_authenticated/admin/")({
 });
 
 async function loadStats() {
-  const [products, orders, pendingOrders, customers, lowStock] = await Promise.all([
+  const [products, orders, pendingOrders, orderCustomers, lowStock] = await Promise.all([
     supabase.from("products").select("id", { count: "exact", head: true }),
     supabase.from("orders").select("id", { count: "exact", head: true }),
     supabase.from("orders").select("id", { count: "exact", head: true }).eq("status", "pending"),
-    supabase.from("profiles").select("id", { count: "exact", head: true }),
+    supabase.from("orders").select("user_id"),
     supabase.from("product_variants").select("id,stock,low_stock_threshold").lte("stock", 3).limit(50),
   ]);
+  const uniqueCustomers = new Set(
+    (orderCustomers.data ?? []).map((o) => o.user_id).filter(Boolean),
+  ).size;
   return {
     products: products.count ?? 0,
     orders: orders.count ?? 0,
     pendingOrders: pendingOrders.count ?? 0,
-    customers: customers.count ?? 0,
+    customers: uniqueCustomers,
     lowStock: (lowStock.data ?? []).filter((v) => v.stock <= v.low_stock_threshold).length,
   };
 }
